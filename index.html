@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Моя кладовая ИИ</title>
+  <style>
+    :root {
+      --bg: #f4f6fb; --surface: #ffffff; --text: #172033; --muted: #68738a;
+      --line: #e1e6f0; --accent: #5368e8; --accent-soft: #eef0ff;
+      --shadow: 0 10px 30px rgba(30, 43, 80, .07);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg:#10131b; --surface:#191e2a; --text:#eef1fb; --muted:#a5aec2; --line:#2c3445; --accent:#9aa7ff; --accent-soft:#272c48; --shadow:0 10px 30px rgba(0,0,0,.2); }
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; background:var(--bg); color:var(--text); font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif; }
+    .wrap { max-width:1100px; margin:0 auto; padding:28px 20px 48px; }
+    header { display:flex; gap:18px; align-items:center; justify-content:space-between; flex-wrap:wrap; margin-bottom:26px; }
+    .brand { display:flex; gap:13px; align-items:center; }
+    .logo { width:48px; height:48px; display:grid; place-items:center; border-radius:15px; background:linear-gradient(135deg,#6477f5,#9a66e8); color:white; font-size:25px; box-shadow:var(--shadow); }
+    h1 { margin:0; font-size:clamp(24px,4vw,34px); letter-spacing:-.6px; }
+    .subtitle { margin:3px 0 0; color:var(--muted); font-size:14px; }
+    .tools { display:flex; gap:9px; align-items:center; flex-wrap:wrap; }
+    input[type="search"] { width:min(300px,75vw); border:1px solid var(--line); background:var(--surface); color:var(--text); border-radius:12px; padding:11px 14px; font:inherit; outline:none; }
+    input[type="search"]:focus { border-color:var(--accent); box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent); }
+    button,.filter { cursor:pointer; border:1px solid var(--line); background:var(--surface); color:var(--text); border-radius:11px; padding:10px 13px; font:inherit; }
+    button:hover,.filter:hover { border-color:var(--accent); }
+    .hero { border:1px solid var(--line); border-radius:22px; padding:22px; background:linear-gradient(120deg,var(--surface),var(--accent-soft)); margin-bottom:22px; }
+    .hero h2 { margin:0 0 7px; font-size:21px; }
+    .hero p { color:var(--muted); margin:0; max-width:760px; }
+    .filters { display:flex; gap:8px; flex-wrap:wrap; margin:0 0 18px; }
+    .filter[aria-pressed="true"] { background:var(--accent-soft); border-color:var(--accent); color:var(--accent); font-weight:650; }
+    .grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:15px; }
+    .card { display:flex; flex-direction:column; min-height:205px; padding:18px; border:1px solid var(--line); background:var(--surface); border-radius:18px; box-shadow:var(--shadow); }
+    .card-top { display:flex; gap:12px; align-items:center; }
+    .service-icon { width:44px; height:44px; border-radius:13px; display:grid; place-items:center; font-size:23px; background:var(--accent-soft); flex-shrink:0; }
+    .card h3 { margin:0; font-size:17px; }
+    .tag { display:inline-block; color:var(--muted); font-size:12px; margin-top:2px; }
+    .card p { color:var(--muted); font-size:14px; margin:13px 0 18px; }
+    .actions { display:flex; gap:8px; margin-top:auto; }
+    .open { flex:1; text-decoration:none; text-align:center; border-radius:11px; background:var(--accent); color:white; padding:10px 12px; font-weight:650; }
+    .open:hover { filter:brightness(1.07); }
+    .fav { width:43px; font-size:18px; padding:8px; }
+    .fav[aria-pressed="true"] { color:#d79a00; border-color:#d79a00; }
+    .section-title { display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin:26px 0 13px; }
+    .section-title h2 { margin:0; font-size:20px; }
+    .count { color:var(--muted); font-size:13px; }
+    .notice { margin-top:23px; padding:14px 16px; border:1px solid var(--line); border-radius:14px; color:var(--muted); font-size:13px; }
+    footer { color:var(--muted); font-size:12px; text-align:center; margin-top:25px; }
+    .empty { padding:30px; text-align:center; color:var(--muted); border:1px dashed var(--line); border-radius:16px; grid-column:1/-1; }
+    @media(max-width:800px) { .grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+    @media(max-width:540px) { .wrap { padding:20px 13px 35px; } .grid { grid-template-columns:1fr; } .hero { padding:18px; } header { align-items:flex-start; } .tools { width:100%; } input[type="search"] { flex:1; min-width:0; } }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true">✦</div>
+        <div><h1>Моя кладовая ИИ</h1><p class="subtitle">Удобная стартовая страница для нейросетей</p></div>
+      </div>
+      <div class="tools">
+        <input id="search" type="search" placeholder="Найти нейросеть…" aria-label="Найти нейросеть">
+        <button id="showFav" type="button" aria-pressed="false">★ Избранное</button>
+      </div>
+    </header>
+
+    <section class="hero">
+      <h2>Все помощники — в одном месте</h2>
+      <p>Выбирай сервис, ищи по названию или сохраняй нужные сайты в избранное. Портал не хранит пароли и не передаёт твои запросы: переход к нейросети происходит напрямую на её официальном сайте.</p>
+    </section>
+
+    <nav class="filters" aria-label="Категории">
+      <button class="filter" data-filter="all" aria-pressed="true">Все</button>
+      <button class="filter" data-filter="chat" aria-pressed="false">Чат и тексты</button>
+      <button class="filter" data-filter="search" aria-pressed="false">Поиск и ответы</button>
+      <button class="filter" data-filter="image" aria-pressed="false">Изображения</button>
+      <button class="filter" data-filter="code" aria-pressed="false">Программирование</button>
+    </nav>
+
+    <div class="section-title"><h2 id="listTitle">Популярные сервисы</h2><span class="count" id="count"></span></div>
+    <section class="grid" id="grid" aria-live="polite"></section>
+
+    <aside class="notice">
+      <strong>Примечание.</strong> Доступность сервисов, регистрация и условия использования зависят от страны и могут меняться. Эта страница не обходит региональные ограничения. Если сервис сообщает, что регион не поддерживается, используй доступную альтернативу и проверяй официальные условия.
+    </aside>
+    <footer>Личная стартовая страница · Избранное хранится только в этом браузере</footer>
+  </main>
+  <script>
+    const services = [
+      {id:"chatgpt",name:"ChatGPT",icon:"✳️",category:"chat",label:"Чат и тексты",desc:"Помощник для вопросов, текстов, анализа и идей.",url:"https://chatgpt.com/"},
+      {id:"gemini",name:"Google Gemini",icon:"✦",category:"chat",label:"Чат и тексты",desc:"ИИ-помощник Google для диалогов и работы с информацией.",url:"https://gemini.google.com/"},
+      {id:"gigachat",name:"GigaChat",icon:"🟢",category:"chat",label:"Чат и тексты",desc:"Русскоязычный ИИ-помощник от Сбера.",url:"https://giga.chat/"},
+      {id:"alice",name:"Алиса AI",icon:"🟣",category:"chat",label:"Чат и тексты",desc:"ИИ-помощник Яндекса для повседневных задач.",url:"https://alice.yandex.ru/"},
+      {id:"deepseek",name:"DeepSeek",icon:"🐳",category:"chat",label:"Чат и тексты",desc:"Диалоговая модель для вопросов, рассуждений и кода.",url:"https://chat.deepseek.com/"},
+      {id:"perplexity",name:"Perplexity",icon:"◈",category:"search",label:"Поиск и ответы",desc:"Поиск с ответами и ссылками на источники.",url:"https://www.perplexity.ai/"},
+      {id:"copilot",name:"Microsoft Copilot",icon:"🌈",category:"chat",label:"Чат и тексты",desc:"ИИ-помощник Microsoft.",url:"https://copilot.microsoft.com/"},
+      {id:"qwen",name:"Qwen Chat",icon:"☁️",category:"chat",label:"Чат и тексты",desc:"Семейство ИИ-моделей и чат-интерфейс Qwen.",url:"https://chat.qwen.ai/"},
+      {id:"huggingface",name:"Hugging Face",icon:"🤗",category:"code",label:"Модели и код",desc:"Каталог моделей, демо-приложений и инструментов ИИ.",url:"https://huggingface.co/"},
+      {id:"ideogram",name:"Ideogram",icon:"🎨",category:"image",label:"Изображения",desc:"Создание изображений и графики по описанию.",url:"https://ideogram.ai/"},
+      {id:"leonardo",name:"Leonardo AI",icon:"🖼️",category:"image",label:"Изображения",desc:"Генерация и редактирование изображений.",url:"https://leonardo.ai/"},
+      {id:"blackbox",name:"Blackbox AI",icon:"⌘",category:"code",label:"Программирование",desc:"Инструменты ИИ для разработчиков и работы с кодом.",url:"https://www.blackbox.ai/"}
+    ];
+    const categoryNames = {all:"Популярные сервисы",chat:"Чат и тексты",search:"Поиск и ответы",image:"Создание изображений",code:"Программирование"};
+    const grid = document.getElementById("grid");
+    const search = document.getElementById("search");
+    const favButton = document.getElementById("showFav");
+    let activeFilter = "all", favoritesOnly = false;
+    const storageKey = "ai-pantry-favorites-v1";
+    function getFavorites() {
+      try { return new Set(JSON.parse(localStorage.getItem(storageKey) || "[]")); }
+      catch (_) { return new Set(); }
+    }
+    let favorites = getFavorites();
+    function saveFavorites() {
+      try { localStorage.setItem(storageKey, JSON.stringify([...favorites])); } catch (_) {}
+    }
+    function render() {
+      const q = search.value.trim().toLocaleLowerCase("ru");
+      const visible = services.filter(s =>
+        (activeFilter === "all" || s.category === activeFilter) &&
+        (!favoritesOnly || favorites.has(s.id)) &&
+        (!q || (s.name+" "+s.desc+" "+s.label).toLocaleLowerCase("ru").includes(q))
+      );
+      document.getElementById("listTitle").textContent = favoritesOnly ? "Избранное" : categoryNames[activeFilter];
+      document.getElementById("count").textContent = visible.length + " сервисов";
+      grid.replaceChildren();
+      if (!visible.length) {
+        const empty = document.createElement("div"); empty.className="empty";
+        empty.textContent = favoritesOnly ? "В избранном пока пусто. Нажми ★ на карточке сервиса." : "Ничего не найдено. Попробуй изменить запрос.";
+        grid.append(empty); return;
+      }
+      for (const s of visible) {
+        const card = document.createElement("article"); card.className="card";
+        const top = document.createElement("div"); top.className="card-top";
+        const ico = document.createElement("div"); ico.className="service-icon"; ico.setAttribute("aria-hidden","true"); ico.textContent=s.icon;
+        const nameWrap = document.createElement("div");
+        const h = document.createElement("h3"); h.textContent=s.name;
+        const tag = document.createElement("span"); tag.className="tag"; tag.textContent=s.label;
+        nameWrap.append(h,tag); top.append(ico,nameWrap);
+        const p = document.createElement("p"); p.textContent=s.desc;
+        const actions = document.createElement("div"); actions.className="actions";
+        const a = document.createElement("a"); a.className="open"; a.href=s.url; a.target="_blank"; a.rel="noopener noreferrer"; a.textContent="Открыть сайт ↗";
+        const fav = document.createElement("button"); fav.className="fav"; fav.type="button"; fav.textContent=favorites.has(s.id)?"★":"☆"; fav.setAttribute("aria-label",favorites.has(s.id)?"Убрать из избранного":"Добавить в избранное"); fav.setAttribute("aria-pressed",String(favorites.has(s.id))); fav.title=fav.getAttribute("aria-label");
+        fav.addEventListener("click",()=>{ if(favorites.has(s.id)) favorites.delete(s.id); else favorites.add(s.id); saveFavorites(); render(); });
+        actions.append(a,fav); card.append(top,p,actions); grid.append(card);
+      }
+    }
+    document.querySelectorAll(".filter").forEach(btn=>btn.addEventListener("click",()=>{
+      activeFilter=btn.dataset.filter; favoritesOnly=false; favButton.setAttribute("aria-pressed","false");
+      document.querySelectorAll(".filter").forEach(b=>b.setAttribute("aria-pressed",String(b===btn))); render();
+    }));
+    search.addEventListener("input",render);
+    favButton.addEventListener("click",()=>{favoritesOnly=!favoritesOnly; favButton.setAttribute("aria-pressed",String(favoritesOnly)); if(favoritesOnly){document.querySelectorAll(".filter").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.filter==="all"))); activeFilter="all";} render();});
+    render();
+  </script>
+</body>
+</html>
